@@ -123,7 +123,7 @@ sealed class PlayerEvent{
     object Forward: PlayerEvent()
     object SeekTo: PlayerEvent()
     object Stop: PlayerEvent()
-    data class UpdateProgress(val newProgress: Long): PlayerEvent()
+    data class UpdateProgress(val newProgress: Float): PlayerEvent()
 }
 
 

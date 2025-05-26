@@ -10,6 +10,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import com.example.audioplayerdemo3.audioService.AudioServiceHandler
 import com.example.audioplayerdemo3.audioService.AudioState
+import com.example.audioplayerdemo3.audioService.PlayerEvent
 import com.example.audioplayerdemo3.model.Audio
 import com.example.audioplayerdemo3.model.AudioRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,6 +25,7 @@ import javax.inject.Inject
 
 private val dummyAudio = Audio(
     "".toUri(),
+    "",
     "",
     0L,
     0,
@@ -111,7 +113,34 @@ class AudioViewmodel @Inject constructor(
     }
 
 
-    /////////////////more work to do from- 21:18///////////////
+    fun onUIEvents(uiEvents: UIEvents) = viewModelScope.launch{
+        when(uiEvents){
+            UIEvents.Backward -> audioServiceHandler.onPlayerEvents(PlayerEvent.Backward)
+            UIEvents.Forward -> audioServiceHandler.onPlayerEvents(PlayerEvent.Forward)
+            UIEvents.SeekTONext -> audioServiceHandler.onPlayerEvents(PlayerEvent.SeekToNext)
+            is UIEvents.PlayPause ->{
+                audioServiceHandler.onPlayerEvents(PlayerEvent.PlayPause)
+            }
+            is UIEvents.SeekTo ->{
+                audioServiceHandler.onPlayerEvents(
+                    PlayerEvent.SeekTo,
+                    seekPosition = ((duration * uiEvents.position) / 100f).toLong()
+                )
+            }
+            is UIEvents.SelectedAudioChanged ->{
+                audioServiceHandler.onPlayerEvents(
+                    PlayerEvent.SelectedAudioChanged,
+                    selectedAudioIndex = uiEvents.index
+                )
+            }
+            is UIEvents.UpdateProgress ->{
+                audioServiceHandler.onPlayerEvents(
+                    PlayerEvent.UpdateProgress(uiEvents.newProgress)
+                )
+            }
+
+        }
+    }
 
 
 
